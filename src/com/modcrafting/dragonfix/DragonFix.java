@@ -27,7 +27,7 @@ public class DragonFix extends JavaPlugin implements Listener {
 		    for(World w: getServer().getWorlds())
 		    	for(Chunk c: w.getLoadedChunks())
 		    		chunkLoad(new ChunkLoadEvent(c, false));
-		    
+		    getServer().getPluginManager().registerEvents(this, this);
 		} catch (Exception e) {
 		    e.printStackTrace();
 		    this.setEnabled(false);
