@@ -12,6 +12,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
@@ -52,6 +53,14 @@ public class DragonFix extends JavaPlugin implements Listener {
 		for(Entity e: event.getChunk().getEntities())
 			if(e instanceof EnderDragon)
 				replaceEntity((EnderDragon)e, false);
+	}
+	
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void dragonSpawn(CreatureSpawnEvent event) {
+		Entity e = event.getEntity();
+		if(!(e instanceof EnderDragon) || event.getSpawnReason() == SpawnReason.CUSTOM)
+			return;
+		replaceEntity((EnderDragon)e, true);
 	}
 	
 	private void replaceEntity(EnderDragon e, boolean tc) {
