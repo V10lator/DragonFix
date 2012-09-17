@@ -15,8 +15,6 @@ import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class DragonFix extends JavaPlugin implements Listener {
-	private boolean lock = false;
-	
 	public void onEnable() {
 		for(World w: getServer().getWorlds())
 		   	for(Chunk c: w.getLoadedChunks())
@@ -32,31 +30,23 @@ public class DragonFix extends JavaPlugin implements Listener {
 	
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void chunkLoad(ChunkLoadEvent event) {
-		lock = true;
 		for(Entity e: event.getChunk().getEntities())
 			if(e instanceof EnderDragon)
 				replaceEntity((EnderDragon)e, true);
-		lock = false;
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void chunkUnload(ChunkUnloadEvent event) {
-		lock = true;
 		for(Entity e: event.getChunk().getEntities())
 			if(e instanceof EnderDragon)
 				replaceEntity((EnderDragon)e, false);
-		lock = false;
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void dragonSpawn(CreatureSpawnEvent event) {
-		if(lock)
-			return;
-		lock = true;
 		Entity e = event.getEntity();
 		if(e instanceof EnderDragon)
 			replaceEntity((EnderDragon)e, true);
-		lock = false;
 	}
 	
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
