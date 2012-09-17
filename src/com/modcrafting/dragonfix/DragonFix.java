@@ -15,12 +15,21 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.server.PluginDisableEvent;
+import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import TheEnd.DragonTravel.XemDragon;
+
+import de.V10lator.RideThaDragon.V10Dragon;
+
 public class DragonFix extends JavaPlugin implements Listener {
-	public void onEnable(){
+	private boolean rtd, dt = false;
+	
+	public void onEnable() {
 		try {
 		    Method a = net.minecraft.server.EntityTypes.class.getDeclaredMethod("a", new Class[] {Class.class, String.class, int.class});
 		    a.setAccessible(true);
@@ -34,6 +43,12 @@ public class DragonFix extends JavaPlugin implements Listener {
 		    e.printStackTrace();
 		    this.setEnabled(false);
 		}
+		Plugin p = getServer().getPluginManager().getPlugin("RideThaDragon");
+		if(p != null && p.isEnabled())
+			rtd = true;
+		p = getServer().getPluginManager().getPlugin("DragonTravel");
+		if(p != null && p.isEnabled())
+			dt = true;
 	}
 	
 	public void onDisable() {
@@ -70,8 +85,30 @@ public class DragonFix extends JavaPlugin implements Listener {
 			event.blockList().clear();
 	}
 	
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void pluginEnabled(PluginEnableEvent event)
+	{
+		String p = event.getPlugin().getName();
+		if(p.equals("RideThaDragon"))
+			rtd = true;
+		else if(p.equals("DragonTravel"))
+			dt = true;
+	}
+	
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void pluginDisabled(PluginDisableEvent event)
+	{
+		String p = event.getPlugin().getName();
+		if(p.equals("RideThaDragon"))
+			rtd = false;
+		else if(p.equals("DragonTravel"))
+			dt = false;
+	}
+	
 	private void replaceEntity(EnderDragon e, boolean tc) {
 		EntityEnderDragon d = ((CraftEnderDragon)e).getHandle();
+		if(isPluginDragon(d))
+			return;
 		if(tc)
 			d = new NewDragon(d.world);
 		else
@@ -87,6 +124,11 @@ public class DragonFix extends JavaPlugin implements Listener {
 			nd.setTicksLived(e.getTicksLived());
 		nd.addPotionEffects(e.getActivePotionEffects());
 		e.remove();
-		System.out.print("Dragon replaced: "+tc);
+	}
+	
+	private boolean isPluginDragon(EntityEnderDragon d)
+	{
+		//We check for RideThaDragon (V10Dragon) and DragonTravel (XemDragon) for now.
+		return (rtd && d instanceof V10Dragon) || (dt && d instanceof XemDragon);
 	}
 }
