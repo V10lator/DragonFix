@@ -59,9 +59,8 @@ public class DragonFix extends JavaPlugin implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void dragonSpawn(CreatureSpawnEvent event) {
 		Entity e = event.getEntity();
-		if(!(e instanceof EnderDragon) || event.getSpawnReason() == SpawnReason.CUSTOM)
-			return;
-		replaceEntity((EnderDragon)e, true);
+		if(e instanceof EnderDragon && !(((CraftEnderDragon)e).getHandle() instanceof NewDragon))
+			replaceEntity((EnderDragon)e, true);
 	}
 	
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -88,5 +87,6 @@ public class DragonFix extends JavaPlugin implements Listener {
 			nd.setTicksLived(e.getTicksLived());
 		nd.addPotionEffects(e.getActivePotionEffects());
 		e.remove();
+		System.out.print("Dragon replaced: "+tc);
 	}
 }
